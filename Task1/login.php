@@ -1,3 +1,7 @@
+<?php
+    session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,8 +9,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Register</title>
+    <title>Login</title>
     <!-- CSS only -->
+    <link rel="stylesheet" href="css/index.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
@@ -217,23 +222,73 @@
         }
     </style>
 </head>
+<?php
+    include('dbcon.php');
+    $invalid_cred = false;
+    $email_exist = false;
+    
+    if(isset($_POST['submit'])){
+        $email = $_POST['email'];
+        $password = $_POST['password'];
 
+        $email_search = " SELECT * FROM user WHERE email='$email' ";
+        $query = mysqli_query($conn, $email_search);
+
+        $email_count = mysqli_num_rows($query);
+
+        if($email_count){
+            $email_pass = mysqli_fetch_assoc($query);
+            $pass = $email_pass['password'];
+            $_SESSION['username'] = $email_pass['username'];
+            $pass_decode = password_verify($password, $pass);
+            if($pass_decode){
+                ?>
+                <script>
+                    window.location.href = "index.php";
+                </script>
+                <?php
+            }else{
+                $invalid_cred = true;
+            }
+        }else{
+            $email_exist = true;
+        }
+    }
+?>
 <body>
     <!--Hey! This is the original version
 of Simple CSS Waves-->
     <div class="header">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#" id="title">Content Point</a>
+                <a class="navbar-brand" href="index.php" id="title">Content Point</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+                <?php
+                    if($email_exist === true){
+                        ?>
+                        <div class="alert alert-danger d-flex align-items-center mb-0 px-3 py-1 mx-5" role="alert">
+                            Email not exist!
+                            <button type="button" class="btn-close ms-4" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <?php
+                    }
+                    if($invalid_cred === true){
+                        ?>
+                        <div class="alert alert-danger d-flex align-items-center mb-0 px-3 py-1 mx-5" role="alert">
+                            Invalid credentials !
+                            <button type="button" class="btn-close ms-4" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <?php
+                    }
+                ?>
                 <div class="collapse navbar-collapse " id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Home</a>
+                            <a class="nav-link active" aria-current="page" href="index.php">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">About</a>
@@ -255,7 +310,7 @@ of Simple CSS Waves-->
                 <div class="content-form">
                     <div class="email_id input-group mb-3">
                         <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-envelope"></i></span>
-                        <input type="email" class="form-control input-field" placeholder="Email Id" name="email_id" aria-label="email_id" aria-describedby="basic-addon1" required></p>
+                        <input type="email" class="form-control input-field" placeholder="Email Id" name="email" aria-label="email_id" aria-describedby="basic-addon1" required></p>
                     </div>
                     <div class="password input-group mb-3">
                         <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-lock"></i></span>

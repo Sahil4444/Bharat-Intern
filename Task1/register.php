@@ -1,3 +1,7 @@
+<?php
+    session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,8 +9,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Register</title>
+    <title>Register</title>
     <!-- CSS only -->
+    <link rel="stylesheet" href="css/index.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
@@ -73,6 +78,7 @@
         #login-form form .login-page {
             text-align: center;
             margin-top: 10px;
+            margin-bottom: 20px;
         }
 
         #login-form form .login-page p {
@@ -220,19 +226,83 @@
 <body>
     <!--Hey! This is the original version
 of Simple CSS Waves-->
+        <?php
+        include('dbcon.php');
+            $email_exist = false;
+            $pass_not_match = false;
+        
+            if(isset($_POST['submit'])){
+                $username = mysqli_real_escape_string($conn, $_POST['username']);
+                $email = mysqli_real_escape_string($conn, $_POST['email']);
+                $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+                $password = mysqli_real_escape_string($conn, $_POST['password']);
+                $cpassword = mysqli_real_escape_string($conn, $_POST['cpassword']);
+            
+
+                $pass = password_hash($password, PASSWORD_BCRYPT);
+                $cpass = password_hash($cpassword, PASSWORD_BCRYPT);
+                $emailquery = "SELECT * FROM user WHERE email = '$email' ";
+                $query = mysqli_query($conn, $emailquery);
+
+                $emailcount = mysqli_num_rows($query);
+                if($emailcount > 0){
+                    $email_exist = true;
+                }else{
+                    if($password === $cpassword){
+                        $insertquery = "INSERT INTO user (username, email, phone, password, cpassword) VALUES ('$username', '$email', '$phone', '$pass', '$cpass')";
+                        $iquery = mysqli_query($conn, $insertquery);
+
+                        if($iquery){
+                            ?>
+                            <script>
+                                alert("Registered Successfully!");
+                                window.location.href = "login.php";
+                            </script>
+                            <?php
+                        }
+                    }else{
+
+                            $pass_not_match = true;
+                        
+                            //  <!-- <script> -->
+                            //     <!-- alert("Password not matched!") -->
+                            // <!-- </script> -->
+                            // <!--  -->
+                    }
+                }
+            }
+        ?>
     <div class="header">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#" id="title">Content Point</a>
+                <a class="navbar-brand" href="index.php" id="title">Content Point</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+                <?php
+                    if($email_exist === true){
+                        ?>
+                        <div class="alert alert-danger d-flex align-items-center mb-0 px-3 py-1 mx-5" role="alert">
+                            Email already exist!
+                            <button type="button" class="btn-close ms-4" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <?php
+                    }
+                    if($pass_not_match === true){
+                        ?>
+                        <div class="alert alert-danger d-flex align-items-center mb-0 px-3 py-1 mx-5" role="alert">
+                            Please enter password and confirm password same !
+                            <button type="button" class="btn-close ms-4" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <?php
+                    }
+                ?>
                 <div class="collapse navbar-collapse " id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Home</a>
+                            <a class="nav-link active" aria-current="page" href="index.php">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">About</a>
@@ -254,15 +324,15 @@ of Simple CSS Waves-->
                 <div class="content-form">
                     <div class="name input-group mb-3">
                         <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-user"></i></span>
-                        <input type="text" class="form-control input-field" placeholder="Enter full name" name="username" aria-label="Username" aria-describedby="basic-addon1" required></p>
+                        <input type="text" class="form-control input-field" placeholder="Enter name" name="username" aria-label="name" aria-describedby="basic-addon1" required></p>
                     </div>
                     <div class="email_id input-group mb-3">
                         <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-envelope"></i></span>
-                        <input type="email" class="form-control input-field" placeholder="Email Id" name="email_id" aria-label="email_id" aria-describedby="basic-addon1" required></p>
+                        <input type="email" class="form-control input-field" placeholder="Email Id" name="email" aria-label="email" aria-describedby="basic-addon1" required></p>
                     </div>
                     <div class="phone_no input-group mb-3">
                         <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-phone"></i></span>
-                        <input type="number" class="form-control input-field" placeholder="Phone number" name="phone_no" aria-label="phone_no" aria-describedby="basic-addon1" required></p>
+                        <input type="number" class="form-control input-field" placeholder="Phone number" name="phone" aria-label="phone" aria-describedby="basic-addon1" required></p>
                     </div>
                     <div class="password input-group mb-3">
                         <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-lock"></i></span>
@@ -276,7 +346,7 @@ of Simple CSS Waves-->
                         <button type="submit" id="register-btn" class="btn btn-primary submit" name="submit">Create Account</button>
                     </div>
                     <div class="login-page">
-                        <p>Have an account? <span><a href="login.php">Log in</a></span></p>
+                        <p>Have an account <span><a href="login.php">Login</a></span></p>
                     </div>
                 </div>
             </form>

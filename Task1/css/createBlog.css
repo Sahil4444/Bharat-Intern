@@ -1,0 +1,32 @@
+body{
+    box-sizing: border-box;
+}
+
+#blog-form-body{
+    background-color: #35363A;
+    color: #fff;
+    padding: 30px 40px 149px 40px;
+}
+
+#blog-form-body h4{
+    text-align: center;
+}
+
+#create-blog-form{
+    background-color: #040D12;
+    max-width: 1000px;
+    padding: 15px 20px;
+}
+
+#create-blog-form #thumbnail-img, #blog-img{
+    background-color: #35363A;
+    padding: 5px 10px;
+}
+
+#create-blog-form textarea{
+    color: black
+}
+
+#create-blog-form .form-control{
+    color: #fff;
+}
